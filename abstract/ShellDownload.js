@@ -7,7 +7,6 @@ class ShellDownload extends Download {
     return `echo ${this.source} ${this.out}`;
   }
   async go() {
-    log.info(`go! ${this.source} ${this.out}`);
     const that = this;
     const command = this._buildCommand();
     const commandParts = command.split(/ (.+)/);
@@ -32,20 +31,15 @@ class ShellDownload extends Download {
       process.stderr.on('data', listener);
       process.stdout.on('data', listener);
       process.on('error', (error) => {
-        log.error(error);
         reject(error);
       });
       process.on('exit', function(code) {
         if (code != 0) {
-          log.error(code)
-          log.debug(command);
           reject(code);
         } else {
           resolve();
         }
       });
-    }).catch((err) => {
-      log.error(err);
     });
   }
   _parseStart() {

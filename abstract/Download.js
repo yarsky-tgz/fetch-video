@@ -8,5 +8,4 @@ class Download {
     this.options = options || defaultOptions;
   }
 }
-
 module.exports = Download;
