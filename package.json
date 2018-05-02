@@ -1,0 +1,22 @@
+{
+  "name": "fetch-video",
+  "version": "1.0.0",
+  "description": "fetching (downloading) video by uri, using wget or hls-fetch for .m3u8 to specified outfile",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yarsky-tgz/fetch-video.git"
+  },
+  "author": "Yaroslav Dobzhanskij <merlyn.tgz@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yarsky-tgz/fetch-video/issues"
+  },
+  "homepage": "https://github.com/yarsky-tgz/fetch-video#readme",
+  "dependencies": {
+    "parse-spawn-args": "^1.0.2"
+  }
+}
