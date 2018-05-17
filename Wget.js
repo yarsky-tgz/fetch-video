@@ -1,5 +1,6 @@
 const ShellDownload = require('./abstract/ShellDownload');
-const START_RE = /200 OK/;
+const START_RE = /^Length:/;
+const LENGTH_RE = /^(\d+)$/;
 const PROGRESS_RE = /(\d+)%/;
 const DOT_STYLE = 'giga';
 class Wget extends ShellDownload {
@@ -7,7 +8,12 @@ class Wget extends ShellDownload {
     return `wget --progress=dot:${DOT_STYLE} --show-progress '${this.source}' -O '${this.out}'`;
   }
   _parseStart(output) {
-    return START_RE.test(output);
+    if (START_RE.test(output)) {
+      this._startMet = true;
+    }
+    if (this._startMet) {
+      if (LENGTH_RE.test(output)) return parseInt(output.match(LENGTH_RE)[1]);
+    }
   }
   _parseProgress(output) {
     const matches = output.match(PROGRESS_RE);
