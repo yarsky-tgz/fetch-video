@@ -2,7 +2,7 @@ const ShellDownload = require('./abstract/ShellDownload');
 const START_RE = /^Length:/;
 const LENGTH_RE = /^(\d+)$/;
 const PROGRESS_RE = /(\d+)%/;
-const DOT_STYLE = 'giga';
+const DOT_STYLE = 'kilo';
 class Wget extends ShellDownload {
   _buildCommand() {
     return `wget --progress=dot:${DOT_STYLE} --show-progress '${this.source}' -O '${this.out}'`;
