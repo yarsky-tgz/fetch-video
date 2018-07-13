@@ -7,8 +7,7 @@ class ShellDownload extends Download {
   }
   async go() {
     const that = this;
-    const command = this._buildCommand();
-    console.log(command);
+    const command = await this._buildCommand();
     const commandParts = command.split(/ (.+)/);
     const commandName = commandParts[0];
     const args = parse(commandParts[1]);
