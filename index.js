@@ -7,8 +7,7 @@ function download(url, out, options) {
   } else {
     driver = Wget;
   }
-  const instance = new driver(url, out, options);
-  return instance.go();
+  return new driver(url, out, options);
 }
 module.exports = {
   download: download

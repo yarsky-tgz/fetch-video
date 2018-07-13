@@ -8,6 +8,7 @@ class ShellDownload extends Download {
   async go() {
     const that = this;
     const command = await this._buildCommand();
+    this.emit('command', command);
     const commandParts = command.split(/ (.+)/);
     const commandName = commandParts[0];
     const args = parse(commandParts[1]);
@@ -18,12 +19,11 @@ class ShellDownload extends Download {
       const listener = (data) => {
         if (!isStarted) {
           isStarted = that._parseStart(data.toString());
-          if (isStarted && this.options.onStart) this.options.onStart(isStarted);
-        }
-        if (that.options.onProgress && isStarted) {
+          this.emit('start');
+        } else {
           const progress = that._parseProgress(data.toString());
           if (progress && (progress > oldProgress)) {
-            that.options.onProgress(progress);
+            this.emit('progress', progress);
             oldProgress = progress;
           }
         }
