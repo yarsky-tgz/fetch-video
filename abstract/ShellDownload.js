@@ -19,11 +19,11 @@ class ShellDownload extends Download {
       const listener = (data) => {
         if (!isStarted) {
           isStarted = that._parseStart(data.toString());
-          this.emit('start');
+          that.emit('start');
         } else {
           const progress = that._parseProgress(data.toString());
           if (progress && (progress > oldProgress)) {
-            this.emit('progress', progress);
+            that.emit('progress', progress);
             oldProgress = progress;
           }
         }
