@@ -16,10 +16,10 @@ class ShellDownload extends Download {
       let process = spawn(commandName, args, { env: { LANG: 'C' } });
       let oldProgress = -1;
       let isStarted = false;
-      const listener = (data) => {
+      const listener = data => {
         if (!isStarted) {
           isStarted = that._parseStart(data.toString());
-          that.emit('start');
+          if (isStarted) that.emit('start');
         } else {
           const progress = that._parseProgress(data.toString());
           if (progress && (progress > oldProgress)) {

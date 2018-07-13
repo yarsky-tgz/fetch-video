@@ -2,7 +2,7 @@ const ShellDownload = require('./abstract/ShellDownload');
 const START_RE = /^Length:/;
 const LENGTH_RE = /^(\d+)$/;
 const PROGRESS_RE = /(\d+)%/;
-const DOT_STYLE = 'kilo';
+const DOT_STYLE = 'binary';
 const exec = require('child_process').exec;
 class Wget extends ShellDownload {
   _getBinaryVersion() {
