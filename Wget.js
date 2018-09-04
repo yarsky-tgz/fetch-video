@@ -11,8 +11,12 @@ class Wget extends ShellDownload {
   async _buildCommand() {
     const version = await this._getBinaryVersion();
     const parts = version.split('.');
+    let optional = '';
     if ((parts.length > 2) && (parseInt(parts[1]) > 18)) return `wget --progress=dot:${DOT_STYLE} --show-progress '${this.source}' -O '${this.out}'`;
-    return `wget --progress=dot:${DOT_STYLE} '${this.source}' -O '${this.out}'`;
+    if (proxy) optional += `-e use_proxy=yes -e http_proxy=http://${proxy} -e https_proxy=http://${proxy} `;
+    if (referer) optional += `--referer="${referer}" `;
+    if (agent) optional += `-U "${agent}" `;
+    return `wget --progress=dot:${DOT_STYLE} ${optional}'${this.source}' -O '${this.out}'`;
   }
   _parseStart(output) {
     if (START_RE.test(output)) {
