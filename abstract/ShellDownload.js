@@ -16,7 +16,9 @@ class ShellDownload extends Download {
       let process = spawn(commandName, args, { env: { LANG: 'C' } });
       let oldProgress = -1;
       let isStarted = false;
+      let lastLine = 'unknown error';
       const listener = data => {
+        lastLine = data;
         if (!isStarted) {
           isStarted = that._parseStart(data.toString());
           if (isStarted) that.emit('start');
@@ -30,12 +32,12 @@ class ShellDownload extends Download {
       };
       process.stderr.on('data', listener);
       process.stdout.on('data', listener);
-      process.on('error', (error) => {
-        reject(error);
+      process.on('error', () => {
+        reject(lastLine);
       });
       process.on('exit', function (code) {
-        if (code != 0) {
-          reject(code);
+        if (code !== 0) {
+          reject(lastLine);
         } else {
           resolve();
         }
