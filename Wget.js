@@ -9,6 +9,7 @@ class Wget extends ShellDownload {
     return new Promise((resolve => exec('wget --version|head -n 1|cut -d " " -f 3', (err, stde) => resolve(stde))));
   }
   async _buildCommand() {
+    const { referer, agent, proxy } = this.options;
     const version = await this._getBinaryVersion();
     const parts = version.split('.');
     let optional = '';
