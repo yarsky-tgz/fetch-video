@@ -3,17 +3,10 @@ const START_RE = /Length:/;
 const LENGTH_RE = /(\d+)/;
 const PROGRESS_RE = /(\d+)%/;
 const DOT_STYLE = 'binary';
-const exec = require('child_process').exec;
 class Wget extends ShellDownload {
-  _getBinaryVersion() {
-    return new Promise((resolve => exec('wget --version|head -n 1|cut -d " " -f 3', (err, stde) => resolve(stde))));
-  }
   async _buildCommand() {
     const { referer, agent, proxy } = this.options;
-    const version = await this._getBinaryVersion();
-    const parts = version.split('.');
     let optional = '';
-    if ((parts.length > 2) && (parseInt(parts[1]) > 18)) return `wget --progress=dot:${DOT_STYLE} --show-progress '${this.source}' -O '${this.out}'`;
     if (proxy) optional += `-e use_proxy=yes -e http_proxy=http://${proxy} -e https_proxy=http://${proxy} `;
     if (referer) optional += `--referer="${referer}" `;
     if (agent) optional += `-U "${agent}" `;
