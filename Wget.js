@@ -1,30 +1,21 @@
-const ShellDownload = require('./abstract/ShellDownload');
-const START_RE = /Length:/;
-const LENGTH_RE = /(\d+)/;
-const PROGRESS_RE = /(\d+)%/;
-const DOT_STYLE = 'binary';
-class Wget extends ShellDownload {
-  async _buildCommand() {
-    const { referer, agent, proxy } = this.options;
-    let optional = '';
-    if (proxy) optional += `-e use_proxy=yes -e http_proxy=http://${proxy} -e https_proxy=http://${proxy} `;
-    if (referer) optional += `--referer="${referer}" `;
-    if (agent) optional += `-U "${agent}" `;
-    return `wget --progress=dot:${DOT_STYLE} ${optional}'${this.source}' -O '${this.out}'`;
-  }
-  _parseStart(output) {
-    if (START_RE.test(output)) {
-      this._startMet = true;
-    }
-    if (this._startMet) {
-      if (LENGTH_RE.test(output)) return parseInt(output.match(LENGTH_RE)[1]);
-    }
-  }
-  _parseProgress(output) {
-    const matches = output.match(PROGRESS_RE);
-    if (matches) {
-      return parseInt(matches[1]);
-    }
+const Download = require('./abstract/Download');
+const request = require('request');
+const progress = require('request-progress');
+class Wget extends Download {
+  go() {
+    const { proxy, headers } = this.options || {};
+    const { host, port } = proxy || {};
+    return new Promise((resolve, reject) => {
+      const stream = progress(request(this.source, {
+        proxy: `http://${host}:${port}`,
+        headers
+      }), {
+        throttle: 1000
+      });
+      stream.on('progress', progress => this.updateProgress(progress.percent, 1, progress.size.transferred));
+      stream.on('error', reject);
+      stream.on('end', resolve);
+    });
   }
 }
 module.exports = Wget;

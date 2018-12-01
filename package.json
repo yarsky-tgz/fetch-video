@@ -1,6 +1,6 @@
 {
   "name": "fetch-video",
-  "version": "1.1.7",
+  "version": "2.0.0",
   "description": "fetching (downloading) video by uri, using wget or hls-fetch for .m3u8 to specified outfile",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,14 @@
   },
   "homepage": "https://github.com/yarsky-tgz/fetch-video#readme",
   "dependencies": {
-    "parse-spawn-args": "^1.0.2"
+    "m3u8-parser": "^4.2.0",
+    "m3u8stream": "^0.6.0",
+    "miniget": "^1.5.1",
+    "parse-spawn-args": "^1.0.2",
+    "progress-stream": "^2.0.0",
+    "request": "^2.88.0",
+    "request-progress": "^3.0.0",
+    "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
     "tap": "^11.1.5"
