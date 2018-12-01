@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const fs = require('fs');
 class Download extends EventEmitter {
   constructor(source, out, options) {
     super();
@@ -22,5 +23,16 @@ class Download extends EventEmitter {
     this.progress = newProgress;
     this.emit('progress', newProgress);
   }
+  go() {
+    return new Promise(async (resolve, reject) => {
+      const stream = await this._getStream();
+      stream.on('error', reject);
+      const outStream = fs.createWriteStream(this.out);
+      outStream.on('finish', resolve);
+      outStream.on('error', reject);
+      stream.pipe(outStream);
+    });
+  }
+
 }
 module.exports = Download;
