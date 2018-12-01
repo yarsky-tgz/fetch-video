@@ -1,6 +1,7 @@
 const Download = require('./abstract/Download');
 const request = require('request');
 const progress = require('request-progress');
+const fs = require('fs');
 class Wget extends Download {
   go() {
     const { proxy, headers } = this.options || {};
@@ -15,6 +16,7 @@ class Wget extends Download {
       stream.on('progress', progress => this.updateProgress(progress.percent, 1, progress.size.transferred));
       stream.on('error', reject);
       stream.on('end', resolve);
+      stream.pipe(fs.createWriteStream(this.out));
     });
   }
 }
