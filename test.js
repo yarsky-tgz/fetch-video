@@ -7,7 +7,7 @@ const fetch = require('./');
 (async () => {
   const host = '212.199.61.48';
   const port = '5598';
-  const downloader = fetch.download('https://r6---sn-uxoxu05-vqne.googlevideo.com/videoplayback?mt=1543661407&mv=m&ms=au%2Crdu&id=o-AOOefAbpUVmqhivrZmvVghsSbGCvyryr8p7VVVlTnHxy&gir=yes&ip=195.138.79.163&mm=31%2C29&mn=sn-uxoxu05-vqne%2Csn-3c27sn7s&expire=1543683144&pl=21&c=WEB&itag=18&mime=video%2Fmp4&key=yt6&txp=5531432&nh=%2CIgpwcjAyLmticDAzKgkxMjcuMC4wLjE&fvip=18&ratebypass=yes&clen=20264931&dur=241.905&source=youtube&initcwndbps=1196250&ei=6GcCXMj3JOSyyAWbvpCYBQ&requiressl=yes&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cnh%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&lmt=1540290562811920&ipbits=0&signature=AD141F1AF0E4C5C6ADBEAC7E5E9B88E0E0B27DB0.53CD5C184E59477FE12E3000CA2DBEE1F901DC51',
+  const downloader = fetch.download('http://212.8.243.130:8082/hls-mix/45-1.stream/start/1543904700/end/1543914900/index.m3u8',
     '/tmp/test.mp4', {
       // proxy: {
       //   host,

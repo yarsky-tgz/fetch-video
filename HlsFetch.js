@@ -4,7 +4,7 @@ const {URL} = require('url');
 const {dirname} = require('path');
 const request = require('request-promise-native');
 const {getBestPlaylist} = require('./common');
-const m3u8stream = require('m3u8stream');
+const multistream = require('multistream');
 
 class HlsFetch extends Download {
   async _getStream() {
@@ -13,37 +13,28 @@ class HlsFetch extends Download {
     const url = this.source;
     const {pathname, origin} = new URL(url);
     const parser = new m3u8Parser.Parser();
-    const manifest = await request(url, {
+    const requestOptions = {
       proxy: host ? `http://${host}:${port}` : undefined,
       headers,
-    });
+    };
+    const resolveUri = uri => (uri.indexOf('http') !== 0) ? `${origin}${dirname(pathname)}/${uri}` : uri;
+    const manifest = await request(url, requestOptions);
     parser.push(manifest);
     parser.end();
-    const {segments, playlists} = parser.manifest;
-    const m3u8streamOptions = {
-      requestOptions: {},
-    };
-    if (host) {
-      m3u8streamOptions.requestOptions.transform = parsed => ({
-        protocol: 'http:',
-        host,
-        port,
-        path: parsed.href,
-        headers: {Host: parsed.host, ...headers},
-      });
-    }
-    if (headers) m3u8streamOptions.requestOptions.headers = headers;
-    let stream;
+    let { segments, playlists } = parser.manifest;
     if (playlists && (playlists.length > 0)) {
-      const {uri} = getBestPlaylist(parser.manifest.playlists);
-      stream = m3u8stream((uri.indexOf('http') !== 0) ? `${origin}${dirname(pathname)}/${uri}` : uri, m3u8streamOptions);
-    } else if (segments && (segments.length > 0)) {
-      stream = m3u8stream(url, m3u8streamOptions);
-    } else {
-      return reject(new Error('Unknown playlist type'));
+      const { uri } = getBestPlaylist(parser.manifest.playlists);
+      const segmentsParser = new m3u8Parser.Parser();
+      const segmentsManifest = await request(resolveUri(uri), requestOptions);
+      segmentsParser.push(segmentsManifest);
+      segmentsParser.end();
+      segments = segmentsParser.manifest.segments;
     }
-    stream.on('progress', ({num}, total, bytes) => this.updateProgress(num, total, bytes));
-    return stream;
+    if (!segments || (segments.length === 0)) throw new Error('Unknown playlist type');
+    return multistream(segments.map(({uri}, index) => () => {
+      this.updateProgress(index, segments.length);
+      return request(resolveUri(uri), requestOptions)
+    }));
   }
 }
 
