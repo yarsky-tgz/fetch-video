@@ -8,24 +8,18 @@ const multistream = require('multistream');
 
 class HlsFetch extends Download {
   async _getStream() {
-    const {proxy, headers} = this.options;
-    const {host, port} = proxy || {};
     const url = this.source;
     const {pathname, origin} = new URL(url);
     const parser = new m3u8Parser.Parser();
-    const requestOptions = {
-      proxy: host ? `http://${host}:${port}` : undefined,
-      headers,
-    };
     const resolveUri = uri => (uri.indexOf('http') !== 0) ? `${origin}${dirname(pathname)}/${uri}` : uri;
-    const manifest = await request(url, requestOptions);
+    const manifest = await request(url, this.options);
     parser.push(manifest);
     parser.end();
     let { segments, playlists } = parser.manifest;
     if (playlists && (playlists.length > 0)) {
       const { uri } = getBestPlaylist(parser.manifest.playlists);
       const segmentsParser = new m3u8Parser.Parser();
-      const segmentsManifest = await request(resolveUri(uri), requestOptions);
+      const segmentsManifest = await request(resolveUri(uri), this.options);
       segmentsParser.push(segmentsManifest);
       segmentsParser.end();
       segments = segmentsParser.manifest.segments;
@@ -33,7 +27,7 @@ class HlsFetch extends Download {
     if (!segments || (segments.length === 0)) throw new Error('Unknown playlist type');
     return multistream(segments.map(({uri}, index) => () => {
       this.updateProgress(index, segments.length);
-      return request(resolveUri(uri), requestOptions)
+      return request(resolveUri(uri), this.options)
     }));
   }
 }
