@@ -24,6 +24,11 @@ class Download extends EventEmitter {
         if (length) this.updateProgress(transferred, length);
       });
       stream.on('error', reject);
+      stream.on('response', res => {
+        if (!res || !res.headers) return;
+        if (res.headers['content-encoding'] === 'gzip') return;
+        if (res.headers['content-length']) return progressDuplex.setLength(parseInt(res.headers['content-length'], 10));
+      });
       const outStream = fs.createWriteStream(this.out);
       outStream.on('finish', resolve);
       outStream.on('error', reject);
