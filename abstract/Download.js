@@ -8,24 +8,29 @@ class Download extends EventEmitter {
     this.out = out;
     this.options = options || {};
     this.progress = -1;
+    this.ended = false;
   }
   updateProgress(transferred, length) {
+    if (this.ended) return;
     const newProgress = Math.floor((transferred / length) * 100);
     if (newProgress <= this.progress) return;
     this.progress = newProgress;
     this.emit('progress', newProgress);
   }
-  go() {
-    return new Promise(async (resolve, reject) => {
+  async go() {
+    this.ended = false;
+    await new Promise(async (resolve, reject) => {
       try {
-        const stream = await this._getStream();
+        this.stream = await this._getStream();
         const progressDuplex = progress({ time: 500});
         progressDuplex.on('progress', ({ transferred, length, speed }) => {
+          if (this.ended) return;
           this.emit('speed', parseInt(speed, 10));
           if (length) this.updateProgress(transferred, length);
         });
-        stream.on('error', reject);
-        stream.on('response', res => {
+        this.stream.on('error', reject);
+        this.stream.on('close', resolve);
+        this.stream.on('response', res => {
           if (!res || !res.headers) return;
           if (res.headers['content-encoding'] === 'gzip') return;
           if (res.headers['content-length']) return progressDuplex.setLength(parseInt(res.headers['content-length'], 10));
@@ -33,14 +38,18 @@ class Download extends EventEmitter {
         const outStream = fs.createWriteStream(this.out);
         outStream.on('finish', resolve);
         outStream.on('error', reject);
-        stream
+        this.stream
             .pipe(progressDuplex)
             .pipe(outStream);
       } catch (e) {
         reject(e);
       }
     });
+    this.ended = true;
   }
-
+  abort() {
+    this.stream.destroy();
+    this.emit('abort');
+  }
 }
 module.exports = Download;
