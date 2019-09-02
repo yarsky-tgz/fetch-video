@@ -4,5 +4,9 @@ class Wget extends Download {
   _getStream() {
     return request(this.source, this.options);
   }
+  abort() {
+    this.stream.abort();
+    super.abort();
+  }
 }
 module.exports = Wget;
