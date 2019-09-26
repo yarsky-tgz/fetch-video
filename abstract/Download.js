@@ -6,7 +6,7 @@ class Download extends EventEmitter {
     super();
     this.source = source;
     this.out = out;
-    this.options = options || {};
+    this.options = options || { simple: true };
     this.progress = -1;
     this.ended = false;
   }
@@ -29,9 +29,13 @@ class Download extends EventEmitter {
           if (length) this.updateProgress(transferred, length);
         });
         this.stream.on('error', reject);
-        this.stream.on('close', resolve);
+        this.stream.on('end', resolve);
         this.stream.on('response', res => {
           if (!res || !res.headers) return;
+          if (res.statusCode !== 200) {
+            this.stream.destroy();
+            reject(new Error('Non 200 response'));
+          }
           if (res.headers['content-encoding'] === 'gzip') return;
           if (res.headers['content-length']) return progressDuplex.setLength(parseInt(res.headers['content-length'], 10));
         });
