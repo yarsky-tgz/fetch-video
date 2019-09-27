@@ -15,8 +15,8 @@ class Download extends EventEmitter {
     this.progress = newProgress;
     this.emit('progress', newProgress);
   }
-  async go() {
-    await new Promise(async (resolve, reject) => {
+  go() {
+    return new Promise(async (resolve, reject) => {
       try {
         this.stream = await this._getStream();
         const progressDuplex = progress({ time: 500});
@@ -25,7 +25,6 @@ class Download extends EventEmitter {
           if (length) this.updateProgress(transferred, length);
         });
         this.stream.on('error', reject);
-        this.stream.on('end', resolve);
         this.stream.on('response', res => {
           if (!res || !res.headers) return;
           if (res.statusCode !== 200) {
