@@ -25,19 +25,14 @@ class HlsFetch extends Download {
       segments = segmentsParser.manifest.segments;
     }
     if (!segments || (segments.length === 0)) throw new Error('Unknown playlist type');
-    const streams = [];
-    return multistream(segments.map(({uri}, index) => {
-      streams[index] = request(resolveUri(uri), this.options);
-      return () => {
-        this.updateProgress(index, segments.length);
-        return streams[index];
-      }
+    return multistream(segments.map(({uri}, index) => () => {
+      this.updateProgress(index, segments.length);
+      return request(resolveUri(uri), this.options);
     }));
   }
-  abort() {
-    this.ended = true;
-    this.stream._queue.map(stream => stream()).forEach(stream => stream.abort());
-    super.abort();
+  _abort() {
+    this.stream._queue = [];
+    this.stream._current.abort();
   }
 }
 

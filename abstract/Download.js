@@ -8,23 +8,19 @@ class Download extends EventEmitter {
     this.out = out;
     this.options = options || { simple: true };
     this.progress = -1;
-    this.ended = false;
   }
   updateProgress(transferred, length) {
-    if (this.ended) return;
     const newProgress = Math.floor((transferred / length) * 100);
     if (newProgress <= this.progress) return;
     this.progress = newProgress;
     this.emit('progress', newProgress);
   }
   async go() {
-    this.ended = false;
     await new Promise(async (resolve, reject) => {
       try {
         this.stream = await this._getStream();
         const progressDuplex = progress({ time: 500});
         progressDuplex.on('progress', ({ transferred, length, speed }) => {
-          if (this.ended) return;
           this.emit('speed', parseInt(speed, 10));
           if (length) this.updateProgress(transferred, length);
         });
@@ -33,7 +29,7 @@ class Download extends EventEmitter {
         this.stream.on('response', res => {
           if (!res || !res.headers) return;
           if (res.statusCode !== 200) {
-            this.stream.destroy();
+            this._abort();
             reject(new Error('Non 200 response'));
           }
           if (res.headers['content-encoding'] === 'gzip') return;
@@ -49,10 +45,9 @@ class Download extends EventEmitter {
         reject(e);
       }
     });
-    this.ended = true;
   }
   abort() {
-    this.stream.destroy();
+    this._abort();
     this.emit('abort');
   }
 }
