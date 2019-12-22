@@ -1,6 +1,6 @@
 {
   "name": "fetch-video",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "fetching (downloading) video by uri, using wget or hls-fetch for .m3u8 to specified outfile",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,6 @@
     "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
-    "tap": "^11.1.5"
+    "tap": "^14.10.5"
   }
 }
