@@ -1,54 +1,42 @@
 # fetch-video
-fetching (downloading) video by uri, using wget or hls-fetch 
-for .m3u8 to specified outfile
-
-You must have installed `wget` and `hls-fetch` all features 
-to work properly. 
+m3u8 HLS Stream or video file url downloading to mp4 file with autodetect of url type
 
 ## Installation
 
-Make sure you have installed `wget`.
-
-Install [hls-fetch](https://github.com/osklil/hls-fetch) with all needed Perl CPAN packages.
-
-test it just by running 
-
-```bash
-hls-fetch
-```
-and install package
 ```bash
 npm i fetch-video
 ```
 
 ## Usage
 
-`require('fetch-video').download(url, filename, options:{ onProgress: function(progress)})`
+```javascript
+  const { download } = require('fetch-video');
+  
+  const downloader = download(url, filename, requestOptions);
+  downloader.on('progress', progress => console.log(`Current progress ${progress}`));
+  downloader.on('speed', speed => console.log(`Current speed ${speed}`));
+  downloader.go() // Promise returned 
+    .then(() => console.log(`video stream or file ${url} is downloaded and stored as the ${filename}`));
+```
+
+### download(`url`, `filename`, `requestOptions`) => downloader
 
 `url` - url of your video file or m3u8 playlist
 
 `filename` - filename path to which you want save the video
 
-`options` - for now the only option:
+`requestOptions` - [request options](https://github.com/request/request#requestoptions-callback) 
 
-* `onProgress` - callback to run, for example:
-```javascript
-{
-  onProgress: function(progress) {
-    console.log(progress);
-  }
-}
-``` 
+### downloader.go() => Promise
 
-## Example
+Launches downloading and Promise being resolved on finish.
 
-```javascript
-const fetchVideo = require('fetch-video');
-const url = 'http://somewhere.com/index.m3u8';
-const outPath = '/home/user/videos/movie.ts';
-fetchVideo.download(url, outPath, {
-  onProgress: progress => {
-    console.log(progress) // 1, 2, 3, one cb run for each change
-  }
-});
-```
+### downloader.abort()
+
+Immediately aborts downloading
+
+### downloader.on(name, handler)
+
+Subscribe for event. Currently it supports two events:
+ * `progress` - sending progress percents as payload
+ * `speed` => sending current speed in bytes per second as payload
