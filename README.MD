@@ -15,6 +15,7 @@ npm i fetch-video
   const downloader = download(url, filename, requestOptions);
   downloader.on('progress', progress => console.log(`Current progress ${progress}`));
   downloader.on('speed', speed => console.log(`Current speed ${speed}`));
+  downloader.on('stats', console.log.bind(console));
   downloader.go() // Promise returned 
     .then(() => console.log(`video stream or file ${url} is downloaded and stored as the ${filename}`));
 ```
@@ -23,7 +24,8 @@ npm i fetch-video
 
 `url` - url of your video file or m3u8 playlist
 
-`filename` - filename path to which you want save the video
+`filename` - filename path to which you want save the video. Can be stream. 
+If undefined - then `dev-null` stream used. 
 
 `requestOptions` - [request options](https://github.com/request/request#requestoptions-callback) 
 
@@ -38,5 +40,6 @@ Immediately aborts downloading
 ### downloader.on(name, handler)
 
 Subscribe for event. Currently it supports two events:
- * `progress` - sending progress percents as payload
+ * `progress` => sending progress percents as payload
  * `speed` => sending current speed in bytes per second as payload
+ * `stats` => sending full stats about progress
