@@ -1,6 +1,6 @@
 {
   "name": "fetch-video",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "description": "fetching (downloading) video by uri, using wget or hls-fetch for .m3u8 to specified outfile",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/yarsky-tgz/fetch-video#readme",
   "dependencies": {
+    "dev-null": "^0.1.1",
     "m3u8-parser": "^4.2.0",
     "multistream": "^2.1.1",
     "progress-stream": "^2.0.0",
