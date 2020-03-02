@@ -1,6 +1,6 @@
 {
   "name": "fetch-video",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "fetching (downloading) video by uri, using wget or hls-fetch for .m3u8 to specified outfile",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,8 @@
     "multistream": "^2.1.1",
     "progress-stream": "^2.0.0",
     "request": "^2.88.0",
-    "request-promise-native": "^1.0.5"
+    "request-promise-native": "^1.0.5",
+    "stats-percentile": "^3.1.0"
   },
   "devDependencies": {
     "tap": "^14.10.5"

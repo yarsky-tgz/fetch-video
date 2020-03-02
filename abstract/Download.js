@@ -2,13 +2,16 @@ const EventEmitter = require('events');
 const fs = require('fs');
 const progress = require('progress-stream');
 const devnull = require('dev-null');
+const currentTime = () => ((new Date()).getTime() / 1000);
+
 class Download extends EventEmitter {
   constructor(source, out, options) {
     super();
     this.source = source;
     this.out = typeof out === 'string' ? fs.createWriteStream(this.out) : out ;
-    this.options = options || { simple: true };
+    this.options = options || { simple: true, progressFrequency: 250 };
     this.progress = -1;
+    this.time = 0;
   }
   updateProgress(transferred, length) {
     const newProgress = Math.floor((transferred / length) * 100);
@@ -25,10 +28,12 @@ class Download extends EventEmitter {
     return new Promise(async (resolve, reject) => {
       try {
         this.stream = await this._getStream();
-        const progressDuplex = progress({ time: 500});
+        this.progressDuplex = progress({ time: this.options.progressFrequency });
+        const { progressDuplex } = this;
         progressDuplex.on('progress', ({ transferred, length, speed }) => {
           const { progress, segments } = this;
-          const stats = { transferred, speed: Math.round(speed), progress };
+          this.time = currentTime() - this.start;
+          const stats = { transferred, speed: Math.round(speed), progress, time: this.time };
           if (segments) Object.assign(stats, { segments });
           this.emit('speed', parseInt(speed, 10));
           this.emit('stats', stats);
@@ -50,6 +55,7 @@ class Download extends EventEmitter {
         this.stream
             .pipe(progressDuplex)
             .pipe(outStream);
+        this.start = currentTime();
       } catch (e) {
         reject(e);
       }
