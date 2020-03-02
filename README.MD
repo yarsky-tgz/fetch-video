@@ -43,3 +43,4 @@ Subscribe for event. Currently it supports two events:
  * `progress` => sending progress percents as payload
  * `speed` => sending current speed in bytes per second as payload
  * `stats` => sending full stats about progress
+ * `lastSegmentStats` => stats about time, size and speed of last segment

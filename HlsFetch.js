@@ -6,6 +6,8 @@ const request = require('request-promise-native');
 const {getBestPlaylist} = require('./common');
 const multistream = require('multistream');
 
+const currentTime = () => ((new Date()).getTime() / 1000);
+
 class HlsFetch extends Download {
   async _getStream() {
     const url = this.source;
@@ -25,9 +27,23 @@ class HlsFetch extends Download {
       segments = segmentsParser.manifest.segments;
     }
     if (!segments || (segments.length === 0)) throw new Error('Unknown playlist type');
+    this.updateProgress(0, segments.length);
     return multistream(segments.map(({uri}, index) => () => {
-      this.updateProgress(index, segments.length);
-      return request(resolveUri(uri), this.options);
+      const { progressDuplex } = this;
+      const substream = request(resolveUri(uri), this.options);
+      const segmentLoadingStartTime = currentTime();
+      const { transferred } = progressDuplex ? progressDuplex.progress() : {};
+      const segmentLoadingStartSize = transferred || 0;
+      substream.on('end', () => {
+        const { progressDuplex } = this;
+        const { transferred } = progressDuplex.progress();
+        const size = transferred - segmentLoadingStartSize;
+        const time = currentTime() - segmentLoadingStartTime;
+        this.updateProgress(index + 1, segments.length);
+        const speed = Math.round(size / time);
+        this.emit('lastSegmentStats', { time, speed, size });
+      });
+      return substream;
     }));
   }
   _abort() {
