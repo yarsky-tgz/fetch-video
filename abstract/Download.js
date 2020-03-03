@@ -2,6 +2,7 @@ const EventEmitter = require('events');
 const fs = require('fs');
 const progress = require('progress-stream');
 const devnull = require('dev-null');
+const { performance } = require('perf_hooks');
 const currentTime = () => (performance.now() / 1000);
 
 class Download extends EventEmitter {
