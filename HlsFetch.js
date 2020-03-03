@@ -6,7 +6,7 @@ const request = require('request-promise-native');
 const {getBestPlaylist} = require('./common');
 const multistream = require('multistream');
 
-const currentTime = () => ((new Date()).getTime() / 1000);
+const currentTime = () => (performance.now() / 1000);
 
 class HlsFetch extends Download {
   async _getStream() {
@@ -34,7 +34,10 @@ class HlsFetch extends Download {
       const segmentLoadingStartTime = currentTime();
       const { transferred } = progressDuplex ? progressDuplex.progress() : {};
       const segmentLoadingStartSize = transferred || 0;
-      substream.on('end', () => {
+      substream.once('response', () => {
+        this.emit('response', { time: currentTime() - segmentLoadingStartTime });
+      });
+      substream.once('end', () => {
         const { progressDuplex } = this;
         const { transferred } = progressDuplex.progress();
         const size = transferred - segmentLoadingStartSize;
