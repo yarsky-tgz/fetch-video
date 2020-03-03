@@ -5,6 +5,7 @@ const {dirname} = require('path');
 const request = require('request-promise-native');
 const {getBestPlaylist} = require('./common');
 const multistream = require('multistream');
+const { performance } = require('perf_hooks');
 
 const currentTime = () => (performance.now() / 1000);
 
