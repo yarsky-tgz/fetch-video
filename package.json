@@ -1,6 +1,6 @@
 {
   "name": "fetch-video",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "fetching (downloading) video by uri, using wget or hls-fetch for .m3u8 to specified outfile",
   "main": "index.js",
   "scripts": {

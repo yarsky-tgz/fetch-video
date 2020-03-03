@@ -44,3 +44,4 @@ Subscribe for event. Currently it supports two events:
  * `speed` => sending current speed in bytes per second as payload
  * `stats` => sending full stats about progress
  * `lastSegmentStats` => stats about time, size and speed of last segment
+ * `response` => time elapased between request started and headers got

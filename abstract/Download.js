@@ -2,13 +2,13 @@ const EventEmitter = require('events');
 const fs = require('fs');
 const progress = require('progress-stream');
 const devnull = require('dev-null');
-const currentTime = () => ((new Date()).getTime() / 1000);
+const currentTime = () => (performance.now() / 1000);
 
 class Download extends EventEmitter {
   constructor(source, out, options) {
     super();
     this.source = source;
-    this.out = typeof out === 'string' ? fs.createWriteStream(this.out) : out ;
+    this.out = typeof out === 'string' ? fs.createWriteStream(out) : out ;
     this.options = options || { simple: true, progressFrequency: 250 };
     this.progress = -1;
     this.time = 0;
