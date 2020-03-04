@@ -1,9 +1,9 @@
 const Download = require('./abstract/Download');
 const m3u8Parser = require('m3u8-parser');
-const {URL} = require('url');
-const {dirname} = require('path');
+const { URL } = require('url');
+const { dirname } = require('path');
 const request = require('request-promise-native');
-const {getBestPlaylist} = require('./common');
+const { getBestPlaylist } = require('./common');
 const multistream = require('multistream');
 const { performance } = require('perf_hooks');
 
@@ -15,6 +15,7 @@ class HlsFetch extends Download {
     const {pathname, origin} = new URL(url);
     const parser = new m3u8Parser.Parser();
     const resolveUri = uri => (uri.indexOf('http') !== 0) ? `${origin}${dirname(pathname)}/${uri}` : uri;
+    const playlistsLoadStartTime = currentTime();
     const manifest = await request(url, this.options);
     parser.push(manifest);
     parser.end();
@@ -27,6 +28,7 @@ class HlsFetch extends Download {
       segmentsParser.end();
       segments = segmentsParser.manifest.segments;
     }
+    this.emit('playlistsLoad', { time: currentTime() - playlistsLoadStartTime });
     if (!segments || (segments.length === 0)) throw new Error('Unknown playlist type');
     this.updateProgress(0, segments.length);
     return multistream(segments.map(({uri}, index) => () => {
