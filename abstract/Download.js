@@ -10,7 +10,7 @@ class Download extends EventEmitter {
     super();
     this.source = source;
     this.out = typeof out === 'string' ? fs.createWriteStream(out) : out ;
-    this.options = options || { simple: true, progressFrequency: 250 };
+    this.options = Object.assign({}, { simple: true, progressFrequency: 250 }, options || {});
     this.progress = -1;
     this.time = 0;
   }
